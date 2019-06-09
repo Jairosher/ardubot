@@ -1,10 +1,8 @@
-// Importar las dependencias para configurar el servidor
-var express = require("express");
-var bodyParser = require("body-parser");
-var request = require("request");
-var config= require("./config");
-var app = express();
-
+//importar los modulos a usar
+const express= require('express');
+const bodyParser= require('body-parser');
+const request= require('request');
+const config= require('./config');
 var five = require("johnny-five");
 var board = new five.Board();
 var ventilador=13;
@@ -21,36 +19,39 @@ var foco=new five.Led(foco);
 
 });
 
+var app=express();
 
-app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-// configurar el puerto y el mensaje en caso de exito
-app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
 
-// Ruta de la pagina index
-app.get("/", function (req, res) {
-    res.send("Se ha desplegado de manera exitosa el anyhelpec ChatBot :D!!!");
+app.listen('3000',function(){
+
+console.log('El servidor inicio en el puerto 3000');
+
 });
 
-// Facebook Webhook
+app.get('/', function(req,res){
 
-// Usados para la verificacion
-app.get("/webhook", function (req, res) {
-    // Verificar la coincidendia del token
-    if (req.query["hub.verify_token"] === process.env.VERIFICATION_TOKEN) {
-        // Mensaje de exito y envio del token requerido
-        console.log("webhook verificado!");
-        res.status(200).send(req.query["hub.challenge"]);
-    } else {
-        // Mensaje de fallo
-        console.error("La verificacion ha fallado, porque los tokens no coinciden");
-        res.sendStatus(403);
-    }
+	res.send('Bienvenidos al taller del ITGAM');
+
 });
 
-// Todos eventos de mesenger sera apturados por esta ruta
-app.post("/webhook", function (req, res) {
-   var data= req.body;
+app.get('/webhook',function(req,res){
+
+
+if(req.query['hub.verify_token']===config.FACEBOOK_TOKEN){
+
+			res.send(req.query['hub.challenge']);					
+
+}else{
+
+			res.send('Acceso no autorizado');
+}
+
+});
+
+app.post('/webhook',function(req,res){
+
+	var data= req.body;
 
 	if(data.object=='page'){
 
@@ -61,11 +62,14 @@ app.post("/webhook", function (req, res) {
 				if(messageEvent.message){
 
 					recivedMessage(messageEvent);
-                }
-            });
-        });
-        res.sendStatus(200);
-    }
+				}
+
+			});
+
+		});
+		res.sendStatus(200);
+	}
+
 });
 
 
@@ -246,3 +250,4 @@ function focoOFF(recipientId){
 	sendCallAPI(MessageData);
 
 }
+
