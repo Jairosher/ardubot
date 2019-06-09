@@ -1,0 +1,17 @@
+{
+  "name": "domobot",
+  "version": "1.0.0",
+  "description": "Este bot enciende un foco y un ventilador atraves de Messenger FB",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jorge Galvan",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.0",
+    "express": "^4.15.4",
+    "johnny-five": "^0.11.6",
+    "request": "^2.81.0"
+  }
+}
