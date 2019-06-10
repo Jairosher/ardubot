@@ -39,7 +39,9 @@ app.get('/webhook',function(req,res){
 
 if(req.query['hub.verify_token']===config.FACEBOOK_TOKEN){
 
-			res.send(req.query['hub.challenge']);					
+			res.status(200).send(req.query['hub.challenge']);					
+
+			//res.send(req.query['hub.challenge']);					
 
 }else{
 
