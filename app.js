@@ -24,7 +24,7 @@ var app=express();
 app.use(bodyParser.json());
 
 //app.listen('3000',function(){
-app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
+
 //console.log('El servidor inicio en el puerto 3000');
 
 
@@ -84,49 +84,49 @@ function recivedMessage(event){
 
 }
 
-function evaluateMessage(recipientId,message){
-	var finalMessage="";
+function evaluateMessage(sender,text){
+	let finalMessage="";
+	
+	switch (text){
+		case "@prender ventilador":
+			finalMessage = "ok" ;
+			ventilador.on();
+			break;
+		case "Prender Ventilador":  
+			finalMessage = "ok" ;
+			ventilador.on();
+			break;
+			
+		case "@apagar ventilador":
+			finalMessage = "ok" ;
+			ventilador.off();
+			break;
+		case "Apagar Ventilador":  
+			finalMessage = "ok" ;
+			ventilador.off();
+			break;
 
-	if (isContain(message,'prender ventilador') || isContain(message,'Prender Ventilador')  ){
-
-		VentiladorON(recipientId);
-
-	}else if (isContain(message,'apagar ventilador') || isContain(message,'Apagar Ventilador')  ){
-
-		VentiladorOFF(recipientId);
-
-	}else if (isContain(message,'prender foco')|| isContain(message,'Prender Foco')){
-
-		focoON(recipientId);
-	}else if (isContain(message,'apagar foco')|| isContain(message,'Apagar Foco')){
-		focoOFF(recipientId);
-	}
-	else{
+	default:
 
 		finalMessage="Lo siento, no entendi lo que quieres decir";
 	}
 
-	sendMessage(recipientId,finalMessage);
+	sendMessage(sender,finalMessage);
 
 
 
 }
 
-function isContain(sentece,word){
 
-	return sentece.indexOf(word) > -1 
-
-}
-
-function sendMessage(recipientId,message){
+function sendMessage(sender,finalMessage){
 
 	var MessageData={
 
 			recipient:{
-				id:recipientId
+				id:sender
 			},
 			message:{
-				text:message
+				text:finalMessage
 			}
 
 
@@ -158,98 +158,6 @@ function sendCallAPI(MessageData){
 	});
 }
 
-
-
-function VentiladorON(recipientId){
-
-  	ventilador.on();
-
-  	var finalMessage="Ventilador Encendido";
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
-
-
-function VentiladorOFF(recipientId){
-
-	ventilador.off();
-
-  	var finalMessage="Ventilador Apagado";
-
-
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
-
-function focoON(recipientId){
-
-
-	foco.on();
-
-  	var finalMessage="Foco Prendido";
-
-
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
-
-function focoOFF(recipientId){
-
-
-	foco.off();
-
-  	var finalMessage="Foco Apagado";
-
-
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
+app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
 
 	
