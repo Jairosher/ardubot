@@ -5,17 +5,18 @@ const request= require('request');
 const config= require('./config');
 var five = require("johnny-five");
 var board = new five.Board({ port: process.env.SERIAL_PORT});
-var ventilador=13;
-var foco=12;
+	console.log('Succesfull connection');
+//var ventilador=13;
+//var foco=12;
 
 
 board.on("ready", function() {
 
-var ventilador= new five.Led(ventilador);
-	ventilador.off();
+var ventilador= new five.Led(13);
+	//ventilador.off();
 
-var foco=new five.Led(foco);
-    foco.off();
+//var foco=new five.Led(foco);
+    //foco.off();
 
 });
 
@@ -88,7 +89,7 @@ function evaluateMessage(sender,text){
 	let finalMessage="";
 	
 	switch (text){
-		case "@prender ventilador":
+		case "prender ventilador":
 			finalMessage = "ok" ;
 			ventilador.on();
 			break;
@@ -97,7 +98,7 @@ function evaluateMessage(sender,text){
 			ventilador.on();
 			break;
 			
-		case "@apagar ventilador":
+		case "apagar ventilador":
 			finalMessage = "ok" ;
 			ventilador.off();
 			break;
