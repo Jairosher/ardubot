@@ -90,21 +90,21 @@ function evaluateMessage(sender,text){
 	
 	switch (text){
 		case "prender ventilador":
-			finalMessage = "ok" ;
 			ventilador.on();
+			finalMessage = "ok" ;
 			break;
 		case "Prender Ventilador":  
-			finalMessage = "ok" ;
 			ventilador.on();
+			finalMessage = "ok" ;
 			break;
 			
 		case "apagar ventilador":
-			finalMessage = "ok" ;
 			ventilador.off();
+			finalMessage = "ok" ;
 			break;
 		case "Apagar Ventilador":  
-			finalMessage = "ok" ;
 			ventilador.off();
+			finalMessage = "ok" ;
 			break;
 
 	default:
