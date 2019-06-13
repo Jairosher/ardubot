@@ -5,7 +5,9 @@ const request= require('request');
 const config= require('./config');
 var five = require("johnny-five");
 var board = new five.Board({ port: process.env.SERIAL_PORT});
+
 	console.log('Succesfull connection');
+
 var ventilador=13;
 var foco=12;
 
