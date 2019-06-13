@@ -78,7 +78,7 @@ function recivedMessage(event){
 
 	var sender= event.sender.id;
 	var text=event.message.text;
-
+	var recipientId = event.recipient.id;
 	evaluateMessage(sender,text);
 
 }
@@ -86,19 +86,27 @@ function recivedMessage(event){
 function evaluateMessage(recipientId,message){
 	var finalMessage="";
 
-	if (isContain(message,'prender ventilador') || isContain(message,'Prender Ventilador')  ){
+	if (message){
+		switch (message){
+			case 'prender ventilador': 
 
-		VentiladorON(recipientId);
+				VentiladorON(recipientId);
+				break;
+				
+			case 'Prender Ventilador':
+				VentiladorON(recipientId);
+				break;
 
-	}else if (isContain(message,'apagar ventilador') || isContain(message,'Apagar Ventilador')  ){
+	}
+		else if (message){
+			case 'apagar ventilador': 
 
-		VentiladorOFF(recipientId);
-
-	}else if (isContain(message,'prender foco')|| isContain(message,'Prender Foco')){
-
-		focoON(recipientId);
-	}else if (isContain(message,'apagar foco')|| isContain(message,'Apagar Foco')){
-		focoOFF(recipientId);
+				VentiladorOFF(recipientId);
+				break;
+				
+			case 'Apagar Ventilador':
+				VentiladorOFF(recipientId);
+				break;
 	}
 	else{
 
