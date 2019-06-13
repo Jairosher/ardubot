@@ -92,19 +92,23 @@ function evaluateMessage(sender,text){
 		case "prender ventilador":
 			ventilador.on();
 			finalMessage = "ok" ;
+			console.log("Envio exitoso");
 			break;
 		case "Prender Ventilador":  
 			ventilador.on();
 			finalMessage = "ok" ;
+			console.log("Envio exitoso");
 			break;
 			
 		case "apagar ventilador":
 			ventilador.off();
 			finalMessage = "ok" ;
+			console.log("Envio exitoso");
 			break;
 		case "Apagar Ventilador":  
 			ventilador.off();
 			finalMessage = "ok" ;
+			console.log("Envio exitoso");
 			break;
 
 	default:
