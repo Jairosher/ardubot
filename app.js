@@ -28,6 +28,7 @@ app.use(bodyParser.json());
 
 //console.log('El servidor inicio en el puerto 3000');
 
+
 app.get('/', function(req,res){
 
 	res.send('Bienvenidos al taller del ITGAM');
@@ -40,6 +41,8 @@ app.get('/webhook',function(req,res){
 if(req.query['hub.verify_token']===config.FACEBOOK_TOKEN){
 
 			res.status(200).send(req.query['hub.challenge']);					
+
+			//res.send(req.query['hub.challenge']);					
 
 }else{
 
@@ -77,62 +80,58 @@ function recivedMessage(event){
 
 	var sender= event.sender.id;
 	var text=event.message.text;
-	
+
 	evaluateMessage(sender,text);
 
 }
 
-function evaluateMessage(recipientId,message){
-	var finalMessage="";
+function evaluateMessage(sender,text){
+	let finalMessage="";
+	
+	switch (text){
+		case "prender ventilador":
+			ventilador.on();
+			finalMessage = "ok" ;
+			console.log("Envio exitoso");
+			break;
+		case "Prender Ventilador":  
+			ventilador.on();
+			finalMessage = "ok" ;
+			console.log("Envio exitoso");
+			break;
+			
+		case "apagar ventilador":
+			ventilador.off();
+			finalMessage = "ok" ;
+			console.log("Envio exitoso");
+			break;
+		case "Apagar Ventilador":  
+			ventilador.off();
+			finalMessage = "ok" ;
+			console.log("Envio exitoso");
+			break;
 
-	if (message){
-		switch (message){
-			case 'prender ventilador': 
-
-				VentiladorON(recipientId);
-				break;
-				
-			case 'Prender Ventilador':
-				VentiladorON(recipientId);
-				break;
-
-	}
-		else if (message){
-			case 'apagar ventilador': 
-
-				VentiladorOFF(recipientId);
-				break;
-				
-			case 'Apagar Ventilador':
-				VentiladorOFF(recipientId);
-				break;
-	}
-	else{
+	default:
 
 		finalMessage="Lo siento, no entendi lo que quieres decir";
 	}
 
-	sendMessage(recipientId,finalMessage);
+	sendMessage(sender,finalMessage);
 
 
 
 }
 
-function isContain(sentece,word){
 
-	return sentece.indexOf(word) > -1 
-
-}
-
-function sendMessage(recipientId,message){
+function sendMessage(sender,finalMessage){
 
 	var MessageData={
 
 			recipient:{
-				id:recipientId
+				id:sender
 			},
 			message:{
-				text:message
+				text:finalMessage
 			}
 
 
@@ -164,101 +163,4 @@ function sendCallAPI(MessageData){
 	});
 }
 
-
-
-function VentiladorON(recipientId){
-
-  	ventilador.on();
-
-  	var finalMessage="Ventilador Encendido";
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
-
-
-function VentiladorOFF(recipientId){
-
-	ventilador.off();
-
-  	var finalMessage="Ventilador Apagado";
-
-
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
-
-function focoON(recipientId){
-
-
-	foco.on();
-
-  	var finalMessage="Foco Prendido";
-
-
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
-
-function focoOFF(recipientId){
-
-
-	foco.off();
-
-  	var finalMessage="Foco Apagado";
-
-
-	var MessageData={
-
-			recipient:{
-				id:recipientId
-			},
-			message:{
-				text:finalMessage
-			}
-
-
-	}
-
-	sendCallAPI(MessageData);
-
-}
-
 app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
-
-
-	
