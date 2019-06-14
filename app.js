@@ -6,23 +6,26 @@ const config= require('./config');
 var five = require("johnny-five");
 var board = new five.Board({ port: process.env.SERIAL_PORT});
 	console.log('Succesfull connection');
-//var ventilador=13;
-//var foco=12;
+var ventilador=13;
+var foco=12;
 
 
-//board.on("ready", function() {
+board.on("ready", function() {
 
-//var ventilador= new five.Led(13);
-//	ventilador.blink(1000);
+var ventilador= new five.Led(13);
+	ventilador.blink(1000);
 
-//var foco=new five.Led(foco);
-  //  foco.off();
+var foco=new five.Led(foco);
+    foco.off();
 
 });
 
 var app=express();
 
 app.use(bodyParser.json());
+
+
+app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
 
 //app.listen('3000',function(){
 
@@ -35,114 +38,218 @@ app.get('/', function(req,res){
 
 });
 
-// Start board johnny five
-board.on("ready", function() {
-	console.log('Board is ready');
+app.get('/webhook',function(req,res){
 
-	var focus_a = new five.Led(13);
-	var focus_b = new five.Led(12);
 
-	// Request with method get to webhook
-	app.get('/webhook',function(req, res){
-		if(req.query['hub.verify_token'] === 'hello_token'){
-			res.send(req.query['hub.challenge'])
-		}else{
-			res.send('Invalid token');
-		}
-	})
+if(req.query['hub.verify_token']===config.FACEBOOK_TOKEN){
 
-	// Request with method post to webhook
-	app.post('/webhook',function(req, res){
-		var data = req.body
+			res.send(req.query['hub.challenge']);					
 
-		if(data.object == 'page'){
-			data.entry.forEach(function(pageEntry){
-				pageEntry.messaging.forEach(function(messagingEvent){
-					if(messagingEvent.message){
-						getMessage(messagingEvent)
-					}
-				})
-			})
-		}
-		res.sendStatus(200)
-	})
+}else{
 
-	// Get text messages
-	function getMessage(messagingEvent){
-		var senderID = messagingEvent.sender.id
-		var messageText = messagingEvent.message.text
+			res.send('Acceso no autorizado');
+}
 
-		evaluateTextMessage(senderID, messageText)
-	}
-
-	// Evaluate text message
-	function evaluateTextMessage(senderID, messageText){
-		let message = "";
-
-		switch (messageText) {
-			case "@help":
-				message = "I can help you :)";
-				break;
-			case "@focus":
-				message = "Focus a & b: 1.- @turn_on_focus_a/@turn_off_focus_a 2.- @turn_on_focus_b/@turn_off_focus_b  ";
-				break;
-			case "@turn_on_focus_a":
-				focus_a.on();
-				message = " Focus on :)";
-				break;
-			case "@turn_off_focus_a":
-				focus_a.off();
-				message = " Focus off :)";
-				break;
-			case "@turn_on_focus_b":
-				focus_b.on();
-				message = " Focus on :)";
-				break;
-			case "@turn_off_focus_b":
-				focus_b.off();
-				message = " Focus off :(";
-				break;
-			default:
-				message = "Sorry, we are out of service.";
-		}
-
-		SendTextMessage(senderID, message);
-	}
-
-	// Send text message
-	function SendTextMessage(senderID, message){
-		var messageData = {
-			recipient : {
-				id: senderID
-			},
-			message: {
-				text: message
-			}
-		}
-
-		callSendApi(messageData)
-	}
-
-	// Calling API to send message
-	function callSendApi(messageData){
-		request({
-			uri: 'https://graph.facebook.com/v2.9/me/messages',
-			qs: {access_token: process.env.APP_TOKEN},
-			method: 'POST',
-			json: messageData
-		},function(error, response, data){
-			if(error){
-				console.log('Cannot send message');
-			}
-			else{
-				console.log('Successful message');
-			}
-		});
-	}
-
-	// Start the server.
-	app.listen(process.env.PORT || 5000,function(){
-		console.log('Listening localhost:' + process.env.PORT || 5000)
-	})
 });
-//app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
+
+app.post('/webhook',function(req,res){
+
+	var data= req.body;
+
+	if(data.object=='page'){
+
+		data.entry.forEach(function(dataEntry){
+
+			dataEntry.messaging.forEach(function(messageEvent){
+
+				if(messageEvent.message){
+
+					recivedMessage(messageEvent);
+				}
+
+			});
+
+		});
+		res.sendStatus(200);
+	}
+
+});
+
+
+function recivedMessage(event){
+
+
+	var sender= event.sender.id;
+	var text=event.message.text;
+
+	evaluateMessage(sender,text);
+
+}
+
+function evaluateMessage(recipientId,message){
+	var finalMessage="";
+
+	if (isContain(message,'prender ventilador') || isContain(message,'Prender Ventilador')  ){
+
+		VentiladorON(recipientId);
+
+	}else if (isContain(message,'apagar ventilador') || isContain(message,'Apagar Ventilador')  ){
+
+		VentiladorOFF(recipientId);
+
+	}else if (isContain(message,'prender foco')|| isContain(message,'Prender Foco')){
+
+		focoON(recipientId);
+	}else if (isContain(message,'apagar foco')|| isContain(message,'Apagar Foco')){
+		focoOFF(recipientId);
+	}
+	else{
+
+		finalMessage="Lo siento, no entendi lo que quieres decir";
+	}
+
+	sendMessage(recipientId,finalMessage);
+
+
+
+}
+
+function isContain(sentece,word){
+
+	return sentece.indexOf(word) > -1 
+
+}
+
+function sendMessage(recipientId,message){
+
+	var MessageData={
+
+			recipient:{
+				id:recipientId
+			},
+			message:{
+				text:message
+			}
+
+
+	}
+
+	sendCallAPI(MessageData);
+}
+
+function sendCallAPI(MessageData){
+
+	request({
+
+		uri:config.URI,
+		qs:{access_token:config.APP_TOKEN },
+		method:'POST',
+		json:MessageData
+
+	},function(error,response,data){
+
+		if(error){
+			console.log("Error al enviar el mensaje");
+
+		}else{
+
+			console.log("Envio exitoso");
+
+		}
+
+	});
+}
+
+
+
+function VentiladorON(recipientId){
+
+  	ventilador.on();
+
+  	var finalMessage="Ventilador Encendido";
+	var MessageData={
+
+			recipient:{
+				id:recipientId
+			},
+			message:{
+				text:finalMessage
+			}
+
+	}
+
+	sendCallAPI(MessageData);
+
+}
+
+
+function VentiladorOFF(recipientId){
+
+	ventilador.off();
+
+  	var finalMessage="Ventilador Apagado";
+
+
+	var MessageData={
+
+			recipient:{
+				id:recipientId
+			},
+			message:{
+				text:finalMessage
+			}
+
+
+	}
+
+	sendCallAPI(MessageData);
+
+}
+
+function focoON(recipientId){
+
+
+	foco.on();
+
+  	var finalMessage="Foco Prendido";
+
+
+	var MessageData={
+
+			recipient:{
+				id:recipientId
+			},
+			message:{
+				text:finalMessage
+			}
+
+
+	}
+
+	sendCallAPI(MessageData);
+
+}
+
+function focoOFF(recipientId){
+
+
+	foco.off();
+
+  	var finalMessage="Foco Apagado";
+
+
+	var MessageData={
+
+			recipient:{
+				id:recipientId
+			},
+			message:{
+				text:finalMessage
+			}
+
+
+	}
+
+	sendCallAPI(MessageData);
+
+}
