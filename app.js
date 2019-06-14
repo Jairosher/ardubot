@@ -6,13 +6,14 @@ const config= require('./config');
 var five = require("johnny-five");
 var board = new five.Board({ port: process.env.SERIAL_PORT});
 	console.log('Succesfull connection');
-var ventilador=13;
-var foco=12;
+//var ventilador=13;
+//var foco=12;
+
 
 board.on("ready", function() {
 
 var ventilador= new five.Led(13);
-	ventilador.off();
+	//ventilador.off();
 
 //var foco=new five.Led(foco);
     //foco.off();
@@ -76,7 +77,7 @@ function recivedMessage(event){
 
 	var sender= event.sender.id;
 	var text=event.message.text;
-	var recipientId = event.recipient.id;
+	
 	evaluateMessage(sender,text);
 
 }
