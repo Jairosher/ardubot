@@ -99,9 +99,9 @@ function evaluateMessage(recipientId,message){
 
 	}else if (isContain(message,'prender foco')|| isContain(message,'Prender Foco')){
 
-		focoON(recipientId);
+		finalMessage="Lo siento, que es foco?";
 	}else if (isContain(message,'apagar foco')|| isContain(message,'Apagar Foco')){
-		focoOFF(recipientId);
+		finalMessage="Lo siento, que es foco?";
 	}
 	else{
 
