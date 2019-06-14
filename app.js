@@ -13,7 +13,7 @@ var foco=12;
 board.on("ready", function() {
 
 var ventilador= new five.Led(13);
-	ventilador.off();
+	ventilador.on();
 
 var foco=new five.Led(foco);
     foco.off();
