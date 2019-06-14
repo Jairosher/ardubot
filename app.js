@@ -4,12 +4,10 @@ const bodyParser= require('body-parser');
 const request= require('request');
 const config= require('./config');
 var five = require("johnny-five");
-
-var board = new five.Board();
-
+var board = new five.Board({ port: process.env.SERIAL_PORT});
+	console.log('Succesfull connection');
 var ventilador=13;
 var foco=12;
-
 
 board.on("ready", function() {
 
@@ -22,13 +20,12 @@ var ventilador= new five.Led(13);
 });
 
 var app=express();
-app.use(bodyParser.urlencoded({extended: false}));
+
 app.use(bodyParser.json());
 
 //app.listen('3000',function(){
 
 //console.log('El servidor inicio en el puerto 3000');
-app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
 
 app.get('/', function(req,res){
 
@@ -41,7 +38,7 @@ app.get('/webhook',function(req,res){
 
 if(req.query['hub.verify_token']===config.FACEBOOK_TOKEN){
 
-			res.send(req.query['hub.challenge']);					
+			res.status(200).send(req.query['hub.challenge']);					
 
 }else{
 
@@ -260,6 +257,7 @@ function focoOFF(recipientId){
 
 }
 
+app.listen((process.env.PORT || 5000), () => console.log('El servidor webhook esta escuchando!'));
 
 
 	
