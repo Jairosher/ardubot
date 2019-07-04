@@ -32,8 +32,8 @@ app.listen((process.env.PORT || 3000), () => console.log('El servidor webhook es
     //});
 
 app.get('/', function(req,res){
-
-	res.send('Bienvenidos al taller del ITGAM');
+	res.sendFile(path.join(__dirname + '/index.html'));
+	//res.send('Bienvenidos al taller del ITGAM');
 
 });
 
